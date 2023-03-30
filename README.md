@@ -17,7 +17,7 @@ This project creates a Docker image that includes a Go binary that can be used t
   * [Conjur Policy to grant GitLab Repository identity ability to authenticate using authn-jwt/gitlab web service](https://github.com/infamousjoeg/conjur-policies/blob/84b451b5025fd1bb5fc86c601d172cb27da81b00/grants/grants_authn.yml#L23)
 
 
-## Deploy GitLab
+## Setup GitLab
   ```yaml
   #!/bin/bash
   #============ Variables ===============
