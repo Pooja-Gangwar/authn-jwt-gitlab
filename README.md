@@ -1,7 +1,7 @@
 # authn-jwt-gitlab
 
 ## Description
-CyberArk This project creates a Docker image that includes a Go binary that can be used to authenticate a JWT token against Conjur Secrets Manager and retrieve a secret value.  Ubuntu, Alpine, and UBI-FIPS versions are available.  The secret value is returned to STDOUT and can be used in a GitLab CI pipeline .
+This project creates a Docker image that includes a Go binary that can be used to authenticate a JWT token against Conjur Secrets Manager and retrieve a secret value.  Ubuntu, Alpine, and UBI-FIPS versions are available.  The secret value is returned to STDOUT and can be used in a GitLab CI pipeline.
 
 ## Badges
 [![](https://img.shields.io/docker/pulls/nfmsjoeg/authn-jwt-gitlab)](https://hub.docker.com/r/nfmsjoeg/authn-jwt-gitlab) [![](https://img.shields.io/discord/802650809246154792)](https://discord.gg/J2Tcdg9tmk) [![](https://img.shields.io/reddit/subreddit-subscribers/cyberark?style=social)](https://reddit.com/r/cyberark) ![](https://img.shields.io/github/license/infamousjoeg/authn-jwt-gitlab)
@@ -15,6 +15,67 @@ CyberArk This project creates a Docker image that includes a Go binary that can 
   * [Conjur Policy to create identity for GitLab Repository](https://github.com/infamousjoeg/conjur-policies/blob/16f7375b604646a48b8b59ac9ddc011b6c8a08c6/ci/gitlab/root.yml#L45)
   * [Conjur Policy to grant GitLab Repository identity to use synchronized secrets from CyberArk Vault](https://github.com/infamousjoeg/conjur-policies/blob/84b451b5025fd1bb5fc86c601d172cb27da81b00/grants/grants_ci.yml#L41)
   * [Conjur Policy to grant GitLab Repository identity ability to authenticate using authn-jwt/gitlab web service](https://github.com/infamousjoeg/conjur-policies/blob/84b451b5025fd1bb5fc86c601d172cb27da81b00/grants/grants_authn.yml#L23)
+
+
+## Deploy GitLab
+  ```yaml
+  #!/bin/bash
+  #============ Variables ===============
+  # Is sudo required to run docker/podman - leave empty if no need
+  SUDO=
+  # Using docker/podman
+  CONTAINER_MGR=docker
+  # Docker image URL
+  CONTAINER_IMG=gitlab/gitlab-ce:latest
+  # GitLab URL (if available, use the external hostname)
+  GITLAB_ADDRESS=
+  # GitLab HTTP port
+  GITLAB_HTTP_PORT=9080
+  # GitLab admin user password
+  GITLAB_ROOT_PASSWORD=
+  #============ Script ===============
+  #Deploying GitLab
+  $SUDO $CONTAINER_MGR run --detach \
+    --hostname "$GITLAB_ADDRESS" \
+    --publish "$GITLAB_HTTP_PORT":$GITLAB_HTTP_PORT \
+    --name gitlab-server \
+    --restart always \
+    --shm-size 256m \
+    --env GITLAB_ROOT_PASSWORD="$GITLAB_ROOT_PASSWORD" \
+    --env GITLAB_OMNIBUS_CONFIG="external_url 'http://$GITLAB_ADDRESS:$GITLAB_HTTP_PORT/';" \
+    "$CONTAINER_IMG"
+  ```
+## Deploy GitLab Runner
+  ```yaml
+  #!/bin/bash
+  #============ Variables ===============
+  # Is sudo required to run docker/podman - leave empty if no need
+  SUDO=
+  # Using docker/podman
+  CONTAINER_MGR=docker
+  # Docker image URL
+  CONTAINER_IMG=gitlab/gitlab-runner:latest
+  # GitLab Host
+  GITLAB_HOST=$(hostname -f)
+  # GitLab port
+  GITLAB_PORT=9080
+  # GitLab Instance Registration Token
+  GITLAB_REGISTRATION_TOKEN=
+  #============ Script ===============
+  #Deploying GitLab Runner
+  $SUDO $CONTAINER_MGR volume create gitlab-runner-conjur-config
+  $SUDO $CONTAINER_MGR run -d --name gitlab-runner-conjur --restart always \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v gitlab-runner-conjur-config:/etc/gitlab-runner \
+      "$CONTAINER_IMG"
+  # Registering GitLab runner
+  $SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-conjur-config:/etc/gitlab-runner \
+      "$CONTAINER_IMG" register -u "http://$GITLAB_HOST:$GITLAB_PORT" -r "$GITLAB_REGISTRATION_TOKEN" \
+      --description "Demo Runner" -n --tag-list "conjur-demo" --executor shell
+  # Deploying Summon on the runner
+  $SUDO $CONTAINER_MGR exec -it gitlab-runner-conjur bash -c 'curl -sSL https://raw.githubusercontent.com/cyberark/summon/main/install.sh | bash'
+  $SUDO $CONTAINER_MGR exec -it gitlab-runner-conjur bash -c 'curl -sSL https://raw.githubusercontent.com/cyberark/summon-conjur/main/install.sh | bash'
+  ```
 
 ## Usage
 
@@ -78,7 +139,7 @@ ubi-fips:
 ```
 
 ## Support
-This     is a community supported project.  For support, please file an issue in this repository.
+This is a community supported project.  For support, please file an issue in this repository.
 
 ## Contributing
 If you would like to contribute to this project, please review the [CONTRIBUTING.md](CONTRIBUTING.md) file.
