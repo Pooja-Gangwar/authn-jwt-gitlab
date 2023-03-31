@@ -13,7 +13,7 @@ This project creates a Docker image that includes a Go binary that can be used t
 * [Usage](#usage)
 
 ## Setup GitLab with runner
-1. Start your Free GitLab Ultimate trial for 30 days
+1. Start your [Free GitLab Ultimate trial](https://about.gitlab.com/free-trial/) for 30 days
 2. Add project in GitLab
 3. Get GitLab runner registration token and url details
 4. Make sure settings -> CI/CD -> Token Access is disabled , runner is active and enable runner to pick jobs without tags .
