@@ -92,7 +92,7 @@ alpine:
     ID_TOKEN_2:
       aud: https://gitlab.com
   variables:
-    CONJUR_AUTHN_JWT_TOKEN: $ID_TOKEN_1
+    CONJUR_AUTHN_JWT_TOKEN: $ID_TOKEN_2
   image: nfmsjoeg/authn-jwt-gitlab:alpine
   script:
     - export TEST_USERNAME=$(CONJUR_SECRET_ID="Dev-Team-credential1" /authn-jwt-gitlab)
@@ -105,7 +105,7 @@ ubi-fips:
     ID_TOKEN_3:
       aud: https://gitlab.com
   variables:
-    CONJUR_AUTHN_JWT_TOKEN: $ID_TOKEN_1
+    CONJUR_AUTHN_JWT_TOKEN: $ID_TOKEN_3
   image: nfmsjoeg/authn-jwt-gitlab:ubi-fips
   script:
     - export TEST_USERNAME=$(CONJUR_SECRET_ID="Dev-Team-credential1" /authn-jwt-gitlab)
