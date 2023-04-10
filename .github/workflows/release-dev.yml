@@ -40,8 +40,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push Alpine Docker image
         uses: docker/build-push-action@v3
         with:
@@ -49,7 +49,7 @@ jobs:
           push: true
           target: alpine
           tags: |
-            nfmsjoeg/authn-jwt-gitlab:alpine-dev
+            poojagangwar/authn-jwt-gitlab:alpine-dev
       - name: Build and push Ubuntu Docker image
         uses: docker/build-push-action@v3
         with:
@@ -57,8 +57,8 @@ jobs:
           push: true
           target: ubuntu
           tags: |
-            nfmsjoeg/authn-jwt-gitlab:ubuntu-dev
-            nfmsjoeg/authn-jwt-gitlab:dev
+            poojagangwar/authn-jwt-gitlab:ubuntu-dev
+            poojagangwar/authn-jwt-gitlab:dev
       - name: Build and push UBI-FIPS Docker image
         uses: docker/build-push-action@v3
         with:
@@ -66,4 +66,4 @@ jobs:
           push: true
           target: ubi
           tags: |
-            nfmsjoeg/authn-jwt-gitlab:ubi-fips-dev
+            poojagangwar/authn-jwt-gitlab:ubi-fips-dev
